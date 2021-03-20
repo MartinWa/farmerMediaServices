@@ -1,16 +1,20 @@
 open Farmer
+open Farmer.Builders.Storage
 open FarmerExtension.MediaServices
+
+let storage =
+    storageAccount { name "teststorageaccount" }
 
 let mediaServices =
     { Name = ResourceName "test"
       Location = Location.WestEurope
-      StorageAccountId = "storageAccountId"
+      StorageAccountId = storage.ResourceId
       StorageAccountType = Primary }
 
 let deployment =
     arm {
         location Location.WestEurope
-        add_resource mediaServices
+        add_resources [ storage; mediaServices ]
     }
 
 [<EntryPoint>]
