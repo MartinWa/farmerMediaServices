@@ -5,11 +5,15 @@ open Farmer
 let mediaservices =
     ResourceType("Microsoft.Media/mediaservices", "2018-07-01")
 
+type StorageAccountType =
+    | Primary
+    | Secondary
+
 type Mediaservices =
     { Name: ResourceName
       Location: Location
       StorageAccountId: string //TODO This should be a Farmer type from storage
-      StorageAccountType: string } // TODO Enum
+      StorageAccountType: StorageAccountType } // TODO Enum
     interface IArmResource with
         member this.ResourceId = mediaservices.resourceId this.Name
 
@@ -18,5 +22,5 @@ type Mediaservices =
                    properties =
                        {| storageAccounts =
                               [| {| id = this.StorageAccountId
-                                    ``type`` = this.StorageAccountType |} |] |} |}
+                                    ``type`` = this.StorageAccountType.ToString() |} |] |} |}
             :> _

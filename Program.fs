@@ -1,11 +1,11 @@
 open Farmer
 open FarmerExtension.MediaServices
 
-let mediaServices = { 
-    Name = ResourceName "test"
-    Location = Location.WestEurope
-    StorageAccountId = "storageAccountId"
-    StorageAccountType = "Primary" }
+let mediaServices =
+    { Name = ResourceName "test"
+      Location = Location.WestEurope
+      StorageAccountId = "storageAccountId"
+      StorageAccountType = Primary }
 
 let deployment =
     arm {
