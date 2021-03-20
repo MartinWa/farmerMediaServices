@@ -1,17 +1,24 @@
 open Farmer
-open Farmer.Builders
+open FarmerExtension.MediaServices
 
-let storage =
-    storageAccount {
-        name "test"
-        sku Storage.Sku.Standard_GRS
+let mediaServices = { 
+    Name = ResourceName "test"
+    Location = Location.WestEurope
+    StorageAccountId = "storageAccountId"
+    StorageAccountType = "Primary" }
+
+let deployment =
+    arm {
+        location Location.WestEurope
+        add_resource mediaServices
     }
-
-let deployment = arm { add_resources [ storage ] }
 
 [<EntryPoint>]
 let main argv =
     printf "Generating ARM template..."
-    deployment |> Writer.quickWrite "generated-template"
+
+    deployment
+    |> Writer.quickWrite "generated-template"
+
     printfn "all done! Template written to generated-template.json"
     0 // return an integer exit code
