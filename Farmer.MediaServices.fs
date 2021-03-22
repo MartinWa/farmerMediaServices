@@ -1,28 +1,35 @@
 module FarmerExtension.MediaServices
 
 open Farmer
+open Farmer.Builders
 
 let mediaservices =
     ResourceType("Microsoft.Media/mediaservices", "2018-07-01")
 
-type StorageAccountType =
-    | Primary
-    | Secondary
+let storageAccountParser (primary: StorageAccountConfig) (secondary: StorageAccountConfig option) =
+    match secondary with
+    | Some account ->
+        [ primary, "Primary"
+          account, "Secondary" ]
+    | None -> [ primary, "Primary" ]
+    |> Seq.map
+        (fun (account, typ) ->
+            {| id = account.ResourceId.ArmExpression.Value
+               ``type`` = typ |})
 
 type Mediaservices =
     { Name: ResourceName
       Location: Location
-      StorageAccountId: ResourceId // TODO Change to a list of storage accounts
-      StorageAccountType: StorageAccountType }
+      PrimaryStorageAccount: StorageAccountConfig
+      SecondaryStorageAccount: StorageAccountConfig option }
+
     interface IArmResource with
         member this.ResourceId = mediaservices.resourceId this.Name
 
         member this.JsonModel =
             {| mediaservices.Create(this.Name, this.Location) with
                    properties =
-                       {| storageAccounts =
-                              [| {| id = this.StorageAccountId.ToString  //TODO This is not the ID we are looking for
-                                    ``type`` = this.StorageAccountType.ToString() |} |] |} |}
+                       {| storageAccounts = storageAccountParser this.PrimaryStorageAccount this.SecondaryStorageAccount |} |}
             :> _
 
     interface IBuilder with
@@ -31,5 +38,5 @@ type Mediaservices =
         member this.BuildResources location =
             [ { Name = this.Name
                 Location = location
-                StorageAccountId = this.StorageAccountId
-                StorageAccountType = this.StorageAccountType } ]
+                PrimaryStorageAccount = this.PrimaryStorageAccount
+                SecondaryStorageAccount = this.SecondaryStorageAccount } ]
