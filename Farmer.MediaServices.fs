@@ -17,7 +17,7 @@ let storageAccountParser (primary: StorageAccountConfig) (secondary: StorageAcco
             {| id = account.ResourceId.ArmExpression.Value
                ``type`` = typ |})
 
-type Mediaservices =
+type MediaServices =
     { Name: ResourceName
       Location: Location
       PrimaryStorageAccount: StorageAccountConfig

@@ -1,6 +1,7 @@
 open Farmer
 open Farmer.Builders.Storage
 open FarmerExtension.MediaServices
+open FarmerExtension.MediaServicesTransforms
 
 let storage =
     storageAccount { name "teststorageaccount" }
@@ -11,16 +12,20 @@ let mediaServices =
       PrimaryStorageAccount = storage
       SecondaryStorageAccount = None }
 
+let mediaServicesTransforms =
+    { Name = ResourceName "test2"
+      MediaServices = mediaServices
+      Description = None
+      Outputs = [] }
+
 let deployment =
     arm {
         location Location.WestEurope
-        add_resources [ storage; mediaServices ]
+
+        add_resources [ storage
+                        mediaServices
+                        mediaServicesTransforms ]
     }
-
-
-// let preset = new StandardEncoderPreset(new List<Codec> { new Codec() }, new List<Format> { new Format() }, new Filters())
-
-// let json = JsonSerializer.Serialize preset
 
 [<EntryPoint>]
 let main argv =
@@ -30,8 +35,4 @@ let main argv =
     |> Writer.quickWrite "generated-template"
 
     printfn "all done! Template written to generated-template.json"
-
-    // printfn "%A" json
-
-
     0 // return an integer exit code
